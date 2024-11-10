@@ -54,7 +54,7 @@ void Date::check_valid(unsigned y, unsigned m, unsigned d)
     d1 > d2 is allowed, which returns the negative of d2-d1.
 */
 long operator-(const Date& d1, const Date& d2) {
-    return static_cast<long>(d1.serial) - static_cast<long>(d2.serial);
+    return static_cast<long>(d1.get_serial()) - static_cast<long>(d2.get_serial());
 }
 
 } // namespace minirisk
