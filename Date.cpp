@@ -44,14 +44,9 @@ void Date::check_valid(unsigned y, unsigned m, unsigned d)
     MYASSERT(d >= 1 && d <= dmax, "The day must be a integer between 1 and " << dmax << ", got " << d);
 }
 
-// unsigned Date::day_of_year() const
-// {
-//     return days_ytd[m_m - 1] + ((m_m > 2 && m_is_leap) ? 1 : 0) + (m_d - 1);
-// }
-
 // Compute serial number (ie. days since 1-Jan-1900)
 unsigned Date::compute_serial(unsigned year, unsigned month, unsigned day) {
-    unsigned days = Date::days_epoch[year - Date::first_year];
+    unsigned days = days_epoch[year - first_year];
     days+= days_ytd[month -1] + ((month > 2 && is_leap_year(year)) ? 1:0 ) + (day-1);
     return days;
 }
