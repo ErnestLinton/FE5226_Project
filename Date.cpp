@@ -49,6 +49,39 @@ void Date::check_valid(unsigned y, unsigned m, unsigned d)
 //     return days_ytd[m_m - 1] + ((m_m > 2 && m_is_leap) ? 1 : 0) + (m_d - 1);
 // }
 
+// Compute serial number (ie. days since 1-Jan-1900)
+unsigned Date::compute_serial(unsigned year, unsigned month, unsigned day) {
+    unsigned days = Date::days_epoch[year - Date::first_year];
+    days+= days_ytd[month -1] + ((month > 2 && is_leap_year(year)) ? 1:0 ) + (day-1);
+    return days;
+}
+
+// Convert serial number to a (year, month, day) date
+void Date::serial_to_date(unsigned serial, unsigned& year, unsigned& month, unsigned& day) {
+    // Find year by iterating through days_epoch array
+    unsigned y = first_year;
+    while (serial >= days_epoch[y-first_year + 1]) ++y;
+    year = y;
+
+    // Find remaining days in year
+    unsigned days_in_year = serial - days_epoch[year - first_year];
+
+    // Find month by iterating through days_ytd
+    month = 1;
+    while(days_in_year >= days_ytd[month]) ++month;
+    // Adjust for leap years if date is after Feb
+    if (month > 2 && is_leap_year(year)) {
+        days_in_year-=1; // adjust for 29 feb
+        if (days_in_year == 59) { // check for 29 Feb itself
+            month = 2;
+            day = 29;
+        }
+    }
+        
+    // Calculate Day within month
+    day = days_in_year - days_ytd[month - 1] + 1;
+        
+    }
 
 /*  The function calculates the distance between two Dates.
     d1 > d2 is allowed, which returns the negative of d2-d1.
