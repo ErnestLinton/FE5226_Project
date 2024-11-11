@@ -1,5 +1,4 @@
 #include <iomanip>
-
 #include "Date.h"
 
 namespace minirisk {
@@ -55,28 +54,24 @@ unsigned Date::compute_serial(unsigned year, unsigned month, unsigned day) {
 void Date::serial_to_date(unsigned serial, unsigned& year, unsigned& month, unsigned& day) {
     // Find year by iterating through days_epoch array
     unsigned y = first_year;
-    while (serial >= days_epoch[y-first_year + 1]) ++y;
+    while (serial >= days_epoch[y-first_year + 1]) {++y; if (y==2199) break;}
     year = y;
 
     // Find remaining days in year
     unsigned days_in_year = serial - days_epoch[year - first_year];
 
+    // Adjust for leap years if date is after Feb
+    bool adjusted = false; // checks if adjustment for leap year took place
+    if (is_leap_year(year) && days_in_year>58) {days_in_year-=1; adjusted = true;}
+
     // Find month by iterating through days_ytd
     month = 1;
     while(days_in_year >= days_ytd[month]) ++month;
-    // Adjust for leap years if date is after Feb
-    if (month > 2 && is_leap_year(year)) {
-        days_in_year-=1; // adjust for 29 feb
-        if (days_in_year == 59) { // check for 29 Feb itself
-            month = 2;
-            day = 29;
-        }
-    }
-        
+    
     // Calculate Day within month
     day = days_in_year - days_ytd[month - 1] + 1;
-        
-    }
+    if (adjusted && days_in_year==58) day +=1; // adjusts for 29 Feb    
+}
 
 /*  The function calculates the distance between two Dates.
     d1 > d2 is allowed, which returns the negative of d2-d1.

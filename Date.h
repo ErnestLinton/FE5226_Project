@@ -3,6 +3,7 @@
 #include "Macros.h"
 #include <string>
 #include <array>
+// #include "Date.cpp"
 
 namespace minirisk {
 
@@ -11,21 +12,18 @@ namespace minirisk {
             static const unsigned first_year = 1900;
             static const unsigned last_year = 2200;
             static const unsigned n_years = last_year - first_year;
+
+            // convert date to serial representation
+            static unsigned compute_serial(unsigned year, unsigned month, unsigned day);
+
+            // convert serial number back to day, month, year
+            static void serial_to_date(unsigned serial, unsigned& year, unsigned& month, unsigned& day);
             
         private:
             static std::string padding_dates(unsigned);
 
             // number of days since 1-Jan-1900
             unsigned serial;
-
-            // convert date to serial representation
-            static unsigned compute_serial(unsigned year, unsigned month, unsigned day);
-
-            // // number of days elapsed from beginning of the year
-            // unsigned day_of_year() const;
-
-            // convert serial number back to day, month, year
-            static void serial_to_date(unsigned serial, unsigned& year, unsigned& month, unsigned& day);
 
             friend long operator-(const Date& d1, const Date& d2);
 
@@ -47,8 +45,8 @@ namespace minirisk {
 
             static void check_valid(unsigned y, unsigned m, unsigned d);
 
-            bool operator<(const Date& d) const {return serial < d.serial;}
-            bool operator==(const Date& d) const {return serial == d.serial;}
+            bool operator<(const Date& d) const {return serial < d.get_serial();}
+            bool operator==(const Date& d) const {return serial == d.get_serial();}
             bool operator>(const Date& d) const {return d < (*this);}
 
             // Serialization format based on serial
