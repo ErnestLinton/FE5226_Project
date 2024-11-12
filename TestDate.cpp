@@ -1,10 +1,9 @@
 #include <typeinfo>
 #include <iostream>
-// #include <iomanip>
-// #include <cstdlib>
 #include <ctime>
 #include <cmath>
 #include "Date.h"
+#include "Streamer.h"
 
 using namespace minirisk;
 const std::array<unsigned, 12> days_in_month = { {31,28,31,30,31,30,31,31,30,31,30,31} };
@@ -81,9 +80,7 @@ void test3() {
             if (month == 2 && Date::is_leap_year(year)) max_day += 1; // Adjust for leap year
             for (unsigned day = 1; day <= max_day; ++day) {
                 if (year==1900 && month==1 && day==1) continue;
-                // std::cout << year << "-" << month << "-" << day << std::endl;
                 Date current(year, month, day);
-                // std::cout << "previous: " << previous.get_serial() << " current: " << current.get_serial() << std::endl;
                 if (current.get_serial() != previous.get_serial() + 1) {
                     std::cerr << "Test failed: Serial numbers are not contiguous for dates " 
                                 << previous.to_string() << " and " << current.to_string() << std::endl;
@@ -102,7 +99,7 @@ int main()
     test1();
     test2();
     test3();
-
+    
     return 0;
 }
 
