@@ -1,74 +1,79 @@
 #pragma once
 
 #include "Global.h"
-#include "IObject.h"
 #include "ICurve.h"
+#include "IObject.h"
 #include "MarketDataServer.h"
-#include <vector>
 #include <regex>
+#include <vector>
 
-namespace minirisk {
-
-struct Market : IObject
+namespace minirisk
 {
-private:
-    // NOTE: this function is not thread safe
-    template <typename I, typename T>
-    std::shared_ptr<const I> get_curve(const string& name);
 
-    double from_mds(const string& objtype, const string& name);
-
-public:
-
-    typedef std::pair<string, double> risk_factor_t;
-    typedef std::vector<std::pair<string, double>> vec_risk_factor_t;
-
-    Market(const std::shared_ptr<const MarketDataServer>& mds, const Date& today)
-        : m_today(today)
-        , m_mds(mds)
+    struct Market : IObject
     {
-    }
+    private:
+        // NOTE: this function is not thread safe
+        template <typename I, typename T>
+        std::shared_ptr<const I> get_curve(const string &name);
 
-    virtual Date today() const { return m_today; }
+        double from_mds(const string &objtype, const string &name);
 
-    // get an object of type ICurveDisocunt
-    const ptr_disc_curve_t get_discount_curve(const string& name);
+    public:
+        typedef std::pair<string, double> risk_factor_t;
+        typedef std::vector<std::pair<string, double>> vec_risk_factor_t;
 
-    // yield rate for currency name
-    const double get_yield(const string& name);
+        Market(const std::shared_ptr<const MarketDataServer> &mds, const Date &today)
+            : m_today(today), m_mds(mds)
+        {
+        }
 
-    // fx exchange rate to convert 1 unit of ccy1 into USD
-    const double get_fx_spot(const string& ccy);
+        virtual Date today() const { return m_today; }
 
-    // after the market has been disconnected, it is no more possible to fetch
-    // new data points from the market data server
-    void disconnect()
-    {
-        m_mds.reset();
-    }
+        // get an object of type ICurveDisocunt
+        const ptr_disc_curve_t get_discount_curve(const string &name);
 
-    // returns risk factors matching a regular expression
-    vec_risk_factor_t get_risk_factors(const std::string& expr) const;
+        // yield rate for currency name
+        const double get_yield(const string &name);
 
-    // clear all market curves execpt for the data points
-    void clear()
-    {
-        std::for_each(m_curves.begin(), m_curves.end(), [](auto& p) { p.second.reset(); });
-    }
+        // fx exchange rate to convert 1 unit of ccy1 into USD
+        const double get_fx_spot(const string &ccy);
 
-    // destroy all existing objects and modify a selected number of data points
-    void set_risk_factors(const vec_risk_factor_t& risk_factors);
+        // after the market has been disconnected, it is no more possible to fetch
+        // new data points from the market data server
+        void disconnect()
+        {
+            m_mds.reset();
+        }
 
-private:
-    Date m_today;
-    std::shared_ptr<const MarketDataServer> m_mds;
+        // returns risk factors matching a regular expression
+        vec_risk_factor_t get_risk_factors(const std::string &expr) const;
 
-    // market curves
-    std::map<string, ptr_curve_t> m_curves;
+        // clear all market curves except for the data points
+        void clear()
+        {
+            std::for_each(m_curves.begin(), m_curves.end(), [](auto &p)
+                          { p.second.reset(); });
+        }
 
-    // raw risk factors
-    std::map<string, double> m_risk_factors;
-};
+        // destroy all existing objects and modify a selected number of data points
+        void set_risk_factors(const vec_risk_factor_t &risk_factors);
+
+        // return all yield curve tenors (newly added)
+        std::vector<std::string> get_all_yield_curve_tenors() const;
+
+        void bump_yield_curve(const string &ccy, double bump_size);
+        void bump_all_yield_curves(double bump_size);
+
+    private:
+        Date m_today;
+        std::shared_ptr<const MarketDataServer> m_mds;
+
+        // market curves
+        std::map<string, ptr_curve_t> m_curves;
+
+        // raw risk factors
+        std::map<string, double> m_risk_factors;
+    };
 
 } // namespace minirisk
-
